@@ -3,6 +3,7 @@ package com.danial.cluster;
 import org.apache.helix.HelixManager;
 import org.apache.helix.HelixManagerFactory;
 import org.apache.helix.InstanceType;
+import org.apache.helix.manager.zk.ZkClient;
 import org.apache.helix.participant.StateMachineEngine;
 
 public class FileStore {
@@ -51,6 +52,41 @@ public class FileStore {
         if (_manager != null)
         {
             _manager.disconnect();
+        }
+    }
+
+    public static void main(String[] args)
+    {
+        if (args.length < 2)
+        {
+            System.err.println("USAGE: java FileStore zookeeperAddresses(e.g. localhost:2181) serverId(host_port)");
+            System.exit(1);
+        }
+
+        final String zkAddr = args[0];
+        final String clusterName = SetupCluster.DEFAULT_CLUSTER_NAME;
+        final String serverId = args[1];
+
+        ZkClient zkClient = null;
+        try
+        {
+            // start consumer
+            final FileStore store = new FileStore(zkAddr, clusterName, serverId);
+
+            Runtime.getRuntime().addShutdownHook(new Thread() {
+                public void run() {
+                    System.out.println("Shutting down server: " + serverId);
+                    store.disconnect();
+                }
+            });
+            store.connect();
+        }
+        finally
+        {
+            if (zkClient != null)
+            {
+                zkClient.close();
+            }
         }
     }
 }
