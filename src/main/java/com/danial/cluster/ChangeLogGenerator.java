@@ -70,7 +70,7 @@ public class ChangeLogGenerator implements FileChangeWatcher{
 
     }
 
-    public boolean appendChange(String path, HelixConstants.ChangeType type)
+    public boolean appendChange(String path, FileSystemWatchService.ChangeType type)
     {
         lock.lock();
         if (new File(path).isDirectory())

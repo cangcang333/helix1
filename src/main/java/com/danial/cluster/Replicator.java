@@ -93,9 +93,17 @@ public class Replicator extends RoutingTableProvider {
         String remoteChangeLogDir = masterInstanceConfig.getRecord().getSimpleField("change_log_dir");
         String remoteFilestoreDir = masterInstanceConfig.getRecord().getSimpleField("file_store_dir");
 
+        System.out.println("remoteHost: " + remoteHost);
+        System.out.println("remoteChangeLogDir: " + remoteChangeLogDir);
+        System.out.println("remoteFilestoreDir: " + remoteFilestoreDir);
+
         String localChangeLogDir = localInstanceConfig.getRecord().getSimpleField("change_log_dir");
         String localFilestoreDir = localInstanceConfig.getRecord().getSimpleField("file_store_dir");
         String localcheckpointDir = localInstanceConfig.getRecord().getSimpleField("check_point_dir");
+
+        System.out.println("localChangeLogDir: " + localChangeLogDir);
+        System.out.println("localFilestoreDir: " + localFilestoreDir);
+        System.out.println("localcheckpointDir: " + localcheckpointDir);
 
         // setup rsync for the change log directory
         setupRsync(remoteHost, remoteChangeLogDir, localChangeLogDir);
@@ -141,14 +149,14 @@ public class Replicator extends RoutingTableProvider {
     }
 
     public static void main(String[] args) throws Exception {
-        InstanceConfig localInstanceConfig = new InstanceConfig("localhost_12000");
+        InstanceConfig localInstanceConfig = new InstanceConfig("localhost_12001");
         ZNRecord record = localInstanceConfig.getRecord();
         record.setSimpleField("change_log_dir", "data/local_host_12001/translog");
         record.setSimpleField("file_store_dir", "data/local_host_12001/filestore");
         record.setSimpleField("check_point_dir", "data/local_host_12001/checkpoint");
 
-        InstanceConfig masterInstanceConfig = new InstanceConfig("localhost_12000");
-        record = localInstanceConfig.getRecord();
+        InstanceConfig masterInstanceConfig = new InstanceConfig("localhost_12001");
+        record = masterInstanceConfig.getRecord();
         record.setSimpleField("change_log_dir", "data/local_host_12000/translog");
         record.setSimpleField("file_store_dir", "data/local_host_12000/filestore");
         record.setSimpleField("check_point_dir", "data/local_host_12000/checkpoint");

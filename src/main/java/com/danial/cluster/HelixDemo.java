@@ -92,7 +92,7 @@ public class HelixDemo {
 
         try
         {
-            String baseDir = "/tmp/IntegrationTest"/;
+            String baseDir = "/tmp/IntegrationTest/";
             final String dataDir = baseDir + "zk/dataDir";
             final String logDir = baseDir + "/tmp/logDir";
             FileUtils.deleteDirectory(new File(dataDir));
@@ -127,6 +127,8 @@ public class HelixDemo {
             final String instanceName3 = "localhost_12003";
             addConfiguration(setup, baseDir, clusterName, instanceName1);
             Thread thread1 = new Thread((Runnable)()->{
+
+                /*
                 FileStore fileStore = null;
 
                 try
@@ -139,8 +141,14 @@ public class HelixDemo {
                     System.err.println("Exception: " + e);
                     fileStore.disconnect();
                 }
+
+                 */
             });
 
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
         }
 
     }

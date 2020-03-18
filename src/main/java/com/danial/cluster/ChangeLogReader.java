@@ -1,8 +1,5 @@
 package com.danial.cluster;
 
-import sun.jvm.hotspot.debugger.MachineDescriptionIntelX86;
-import sun.reflect.annotation.ExceptionProxy;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -80,7 +77,7 @@ public class ChangeLogReader implements FileChangeWatcher{
                 changes.add(newRecord);
                 count++;
 
-            } while (count < MAX_ENTRIES_TO_READ && raf.getFilePointer() < raf.length())
+            } while (count < MAX_ENTRIES_TO_READ && raf.getFilePointer() < raf.length());
 
         }
         catch (FileNotFoundException e)
