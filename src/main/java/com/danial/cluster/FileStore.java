@@ -26,6 +26,31 @@ public class FileStore {
             StateMachineEngine stateMach = _manager.getStateMachineEngine();
             FileStoreStateModelFactory modelFactory = new FileStoreStateModelFactory(_manager);
             stateMach.registerStateModelFactory(SetupCluster.DEFAULT_STATE_MODEL, modelFactory);
+            _manager.connect();
+
+
+//            _manager.addExternalViewChangeListener(replicator);    // What does this do
+            Thread.currentThread().join();
+        }
+        catch (InterruptedException e)
+        {
+            System.err.println(" [-] " + _serverId + " is interrupted ... ");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        finally
+        {
+            _manager.disconnect();
+        }
+    }
+
+    public void disconnect()
+    {
+        if (_manager != null)
+        {
+            _manager.disconnect();
         }
     }
 }
