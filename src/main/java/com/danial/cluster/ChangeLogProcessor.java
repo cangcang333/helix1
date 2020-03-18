@@ -36,7 +36,7 @@ public class ChangeLogProcessor implements Runnable{
 
     private Set<String> getRemotePathsToSync(List<ChangeRecord> changes)
     {
-        Set<String> paths = new TreeSet<String>;
+        Set<String> paths = new TreeSet<String>();
         for (ChangeRecord change : changes)
         {
             paths.add(change.file);
@@ -62,7 +62,7 @@ public class ChangeLogProcessor implements Runnable{
                     e.printStackTrace();
                 }
 
-            } while (!shutdownRequested.get())
+            } while (!shutdownRequested.get());
         }
         catch (Exception e)
         {
