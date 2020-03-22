@@ -1,4 +1,4 @@
-package com.danial.cluster;
+package com.danial.filestore;
 
 import org.I0Itec.zkclient.IDefaultNameSpace;
 import org.I0Itec.zkclient.ZkClient;
@@ -19,11 +19,8 @@ import org.apache.helix.model.builder.HelixConfigScopeBuilder;
 import org.apache.helix.participant.StateMachineEngine;
 import org.apache.helix.tools.ClusterSetup;
 
-import org.apache.helix.model.HelixConfigScope;
-
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileStore;
 import java.util.*;
 
 

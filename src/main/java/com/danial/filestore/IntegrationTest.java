@@ -1,4 +1,4 @@
-package com.danial.cluster;
+package com.danial.filestore;
 
 import org.I0Itec.zkclient.IDefaultNameSpace;
 import org.I0Itec.zkclient.ZkClient;
@@ -8,12 +8,14 @@ import org.apache.helix.HelixDataAccessor;
 import org.apache.helix.HelixManager;
 import org.apache.helix.PropertyKey;
 import org.apache.helix.controller.HelixControllerMain;
+import org.apache.helix.manager.zk.ZKHelixAdmin;
 import org.apache.helix.model.HelixConfigScope;
 import org.apache.helix.model.builder.HelixConfigScopeBuilder;
 import org.apache.helix.tools.ClusterSetup;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,7 +29,7 @@ public class IntegrationTest {
         {
             String baseDir = "/tmp/IntegrationTest/";
             final String dataDir = baseDir + "zk/dataDir";
-            final String logDir = baseDir + "zk/logDir";
+            final String logDir = baseDir + "temp/logDir";
             FileUtils.deleteDirectory(new File(dataDir));
             FileUtils.deleteDirectory(new File(logDir));
 
@@ -46,11 +48,16 @@ public class IntegrationTest {
             final String clusterName = "file-store-test";
             setup.deleteCluster(clusterName);
             setup.addCluster(clusterName, true);
-            setup.addInstanceToCluster(clusterName, "localhost:12001");
-            setup.addInstanceToCluster(clusterName, "localhost:12002");
-            setup.addInstanceToCluster(clusterName, "localhost:12003");
-            setup.addResourceToCluster(clusterName, "repository", 1, "MasterSlave");
+            setup.addInstanceToCluster(clusterName, "localhost_12001");
+            setup.addInstanceToCluster(clusterName, "localhost_12002");
+            setup.addInstanceToCluster(clusterName, "localhost_12003");
+            setup.addResourceToCluster(clusterName, "repository", 2, "MasterSlave");
             setup.rebalanceResource(clusterName, "repository", 3);
+
+            ZKHelixAdmin admin = new ZKHelixAdmin(zkAddress);
+            admin.addCluster(clusterName);
+
+
 
             // Set the configuration
             final String instanceName1 = "localhost_12001";
@@ -59,9 +66,7 @@ public class IntegrationTest {
             addConfiguration(setup, baseDir, clusterName, instanceName2);
             final String instanceName3 = "localhost_12003";
             addConfiguration(setup, baseDir, clusterName, instanceName3);
-            Thread thread1 = new Thread(new Runnable() {
-                @Override
-                public void run() {
+            Thread thread1 = new Thread((Runnable) () -> {
                     FileStore fileStore = null;
 
                     try
@@ -74,28 +79,24 @@ public class IntegrationTest {
                         System.err.println("Exception: " + e);
                         fileStore.disconnect();
                     }
-                }
             });
 
             // Start node2
-            Thread thread2 = new Thread(new Runnable() {
-                @Override
-                public void run() {
+            Thread thread2 = new Thread((Runnable) () -> {
                     FileStore fileStore = new FileStore(zkAddress, clusterName, instanceName2);
                     fileStore.connect();
 
-                }
             });
 
-            // Start node2
+            // Start node3
             Thread thread3 = new Thread(new Runnable() {
                 @Override
                 public void run() {
                     FileStore fileStore = new FileStore(zkAddress, clusterName, instanceName3);
                     fileStore.connect();
-
                 }
             });
+
             System.out.println("Starting nodes ...");
             thread1.start();
             thread2.start();
@@ -105,6 +106,31 @@ public class IntegrationTest {
             final HelixManager manager = HelixControllerMain.startHelixController(zkAddress, clusterName, "controller", HelixControllerMain.STANDALONE);
             Thread.sleep(5000);
             printStatus(manager);
+            listFiles(baseDir);
+            System.out.println("Writing files a.txt and b.txt to current master " + baseDir + " localhost_12001" + "/filestore");
+            FileUtils.writeStringToFile(new File(baseDir + "localhost_12001" + "/filestore/a.txt"), "some_data in a");
+            FileUtils.writeStringToFile(new File(baseDir + "localhost_12001" + "/filestore/b.txt"), "some_data in b");
+            Thread.sleep(10000);
+            listFiles(baseDir);
+            Thread.sleep(5000);
+            System.out.println("Stoppint the MASTER node:" + "localhost_12001");
+
+
+            thread1.interrupt();
+            Thread.sleep(10000);
+            printStatus(manager);
+            System.out.println("Writing files c.txt and d.txt to current master " + baseDir
+                    + "localhost_12002" + "/filestore");
+            FileUtils.writeStringToFile(new File(baseDir + "localhost_12002" + "/filestore/c.txt"),
+                    "some_data in c");
+            FileUtils.writeStringToFile(new File(baseDir + "localhost_12002" + "/filestore/d.txt"),
+                    "some_data in d");
+            Thread.sleep(10000);
+            listFiles(baseDir);
+            System.out.println("Create or modify any files under " + baseDir + "localhost_12002"
+                    + "/filestore" + " and it should get replicated to " + baseDir + "localhost_12003"
+                    + "/filestore");
+
         }
         catch (Exception e)
         {
@@ -131,7 +157,17 @@ public class IntegrationTest {
 
     private static void listFiles(String baseDir)
     {
-
+        System.out.println("==========================FILES=========================");
+        String[] instances = new String[] {
+            "localhost_12001", "localhost_12002", "localhost_12003"
+        };
+        for (String instance : instances)
+        {
+            String dir = baseDir + instance + "/filestore";
+            String[] list= new File(dir).list();
+            System.out.println(dir + ":" + ((list != null) ? Arrays.toString(list): "NONE"));
+        }
+        System.out.println("==========================FILES=========================");
     }
 
     private static void addConfiguration(ClusterSetup setup, String baseDir, String clusterName, String instanceName) throws IOException {
@@ -145,9 +181,9 @@ public class IntegrationTest {
         FileUtils.deleteDirectory(new File(properties.get("change_log_dir")));
         FileUtils.deleteDirectory(new File(properties.get("file_store_dir")));
         FileUtils.deleteDirectory(new File(properties.get("check_point_dir")));
-        new File(properties.get("change_log_dir"));
-        new File(properties.get("file_store_dir"));
-        new File(properties.get("check_point_dir"));
+        new File(properties.get("change_log_dir")).mkdirs();
+        new File(properties.get("file_store_dir")).mkdirs();
+        new File(properties.get("check_point_dir")).mkdirs();
 
     }
 }

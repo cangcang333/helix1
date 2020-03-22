@@ -1,4 +1,4 @@
-package com.danial.cluster;
+package com.danial.filestore;
 
 import org.apache.helix.manager.zk.ZKHelixAdmin;
 import org.apache.helix.manager.zk.ZNRecordSerializer;

@@ -1,4 +1,4 @@
-package com.danial.cluster;
+package com.danial.filestore;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,10 +20,6 @@ public class ExternalCommand {
     private InputReader _out;
     private InputReader _err;
 
-    public ProcessBuilder get_processBuilder() {
-        return _processBuilder;
-    }
-
     private static class InputReader extends Thread
     {
         private static final int BUFFER_SIZE = 2048;
@@ -31,10 +27,6 @@ public class ExternalCommand {
         private final InputStream _in;
         private final ByteArrayOutputStream _out;
         private boolean _running = false;
-
-        public ByteArrayOutputStream get_out() {
-            return _out;
-        }
 
         InputReader(InputStream in)
         {

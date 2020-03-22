@@ -40,6 +40,12 @@
             <version>1.2.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.101tec</groupId>
+            <artifactId>zkclient</artifactId>
+            <version>0.5</version>
+        </dependency>
+
 <!--        <dependency>-->
 <!--            <groupId>org.apache.zookeeper</groupId>-->
 <!--            <artifactId>zookeeper</artifactId>-->
@@ -49,13 +55,13 @@
     </dependencies>
 
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
-        <java.version>1.8</java.version>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-    </properties>
+<!--    <properties>-->
+<!--        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>-->
+<!--        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>-->
+<!--        <java.version>1.8</java.version>-->
+<!--        <maven.compiler.source>1.8</maven.compiler.source>-->
+<!--        <maven.compiler.target>1.8</maven.compiler.target>-->
+<!--    </properties>-->
 
 
 </project>

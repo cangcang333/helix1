@@ -1,4 +1,4 @@
-package com.danial.cluster;
+package com.danial.filestore;
 
 import org.apache.helix.HelixManager;
 import org.apache.helix.controller.HelixControllerMain;
